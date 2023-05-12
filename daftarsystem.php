@@ -29,11 +29,12 @@ if (mysqli_num_rows($result) == 0) {
 		header('Location: index.php');
 	} else {
 		// Jika gagal, arahkan kembali ke halaman daftar akun
-		header('Location: register.html');
+		header('Location: register.php');
 	}
 } else {
 	// Jika username sudah terdaftar, arahkan kembali ke halaman daftar akun
-	header('Location: register.html');
+    // ini sementara masih di redirect ke halaman yang sama
+	header('Location: register.php');
 }
 
 mysqli_close($conn);
