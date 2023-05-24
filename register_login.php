@@ -1,6 +1,6 @@
 <?php
 
-include 'konfigurasi.php';
+include 'config.php';
 
 ?>
 
@@ -55,14 +55,14 @@ include 'konfigurasi.php';
             <input type="text" placeholder="Username" name="username" />
           </div>
           <div class="input-field">
-            <i class="fas fa-envelope"></i>
-            <input type="email" placeholder="Email" name="email" />
-          </div>
-          <div class="input-field">
             <i class="fas fa-lock"></i>
             <input type="password" placeholder="Password" name="password" />
           </div>
-          <input type="submit" name="Submitdaftar" class="btn2" value="Daftar" />
+          <div class="input-field">
+            <i class="fas fa-envelope"></i>
+            <input type="email" placeholder="Email" name="email" />
+          </div>
+          <input type="submit" name="submitdaftar" class="btn2" value="Daftar" />
 
           <p class="social-text">Atau Daftar dengan platform sosial</p>
           <div class="social-media">

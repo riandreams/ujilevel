@@ -1,31 +1,33 @@
 <?php
-session_start();
+include 'config.php';
 
-// Koneksi ke database MySQL
-$host = 'localhost'; // Ganti dengan host database kamu
-$user = 'root'; // Ganti dengan username database kamu
-$pass = ''; // Ganti dengan password database kamu
-$dbname = 'database_topup'; // Ganti dengan nama database kamu
+if (isset($_POST['submitlogin'])) {
 
-$conn = mysqli_connect($host, $user, $pass, $dbname);
+	$user = $_POST['username'];
+	$pass = $_POST['password'];
 
-// Ambil data dari form login
-$username = mysqli_real_escape_string($conn, $_POST['username']);
-$password = mysqli_real_escape_string($conn, $_POST['password']);
+	// Escape user inputs to prevent SQL injection
+	$user = mysqli_real_escape_string($conn, $user);
 
-// Cek apakah username dan password benar
-$query = "SELECT * FROM tabel_user WHERE username='$username' AND password='$password'";
-$result = mysqli_query($conn, $query);
+	$stmt = $conn->prepare("SELECT username, password FROM tabel_user WHERE username = ?");
+	$stmt->bind_param("s", $user);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	$stmt->close();
 
-if (mysqli_num_rows($result) == 1) {
-	// Jika benar, set session dan arahkan ke halaman selamat datang
-	$_SESSION['username'] = $username;
-	header('Location: index.php');
-} else {
-	// Jika salah, arahkan ke halaman login kembali
-	header('Location: register.php');
-    echo "<p>Username atau Password salah! silahkan coba lagi.</p>";
+	if ($result->num_rows > 0) {
+		$row = $result->fetch_assoc();
+		$username1 = $row['username'];
+		$enkripsi = $row['password'];
+
+		if (password_verify($pass, $enkripsi)) {
+			session_start();
+			$_SESSION['user'] = $username1;
+			header("Location: index.php");
+			exit;
+		} else {
+			echo "Password salah.";
+		}
+	}
 }
-
-mysqli_close($conn);
 ?>

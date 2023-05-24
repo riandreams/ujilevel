@@ -1,41 +1,26 @@
 <?php
-session_start();
+include 'config.php';
 
-// Koneksi ke database MySQL
-$host = 'localhost'; // Ganti dengan host database kamu
-$user = 'root'; // Ganti dengan username database kamu
-$pass = ''; // Ganti dengan password database kamu
-$dbname = 'database_topup'; // Ganti dengan nama database kamu
+if (isset($_POST['submitdaftar'])) {
+	$username = $_POST['username'];
+	$password = $_POST['password'];
+	$email = $_POST['email'];
 
-$conn = mysqli_connect($host, $user, $pass, $dbname);
+	// Escape user inputs to prevent SQL injection
+	$username = mysqli_real_escape_string($conn, $username);
+	$email = mysqli_real_escape_string($conn, $email);
 
-// Ambil data dari form daftar akun
-$username = mysqli_real_escape_string($conn, $_POST['username']);
-$password = mysqli_real_escape_string($conn, $_POST['password']);
-$email = mysqli_real_escape_string($conn, $_POST['email']);
+	// Hash password using bcrypt
+	$enkripsi = password_hash($password, PASSWORD_DEFAULT);
 
-// Cek apakah username sudah ada di dalam database
-$query = "SELECT * FROM tabel_user WHERE username='$username'";
-$result = mysqli_query($conn, $query);
+	// Insert user data into table using prepared statements
+	$stmt = $conn->prepare("INSERT INTO tabel_user (username, password, email) VALUES (?, ?, ?)");
+	$stmt->bind_param("sss", $username, $enkripsi, $email);
+	$stmt->execute();
+	$stmt->close();
 
-if (mysqli_num_rows($result) == 0) {
-	// Jika username belum terdaftar, masukkan data ke dalam tabel users
-	$query = "INSERT INTO tabel_user (username, password, email) VALUES ('$username', '$password', '$email')";
-	$result = mysqli_query($conn, $query);
-
-	if ($result) {
-		// Jika berhasil, arahkan ke halaman selamat datang
-		$_SESSION['username'] = $username;
-		header('Location: index.php');
-	} else {
-		// Jika gagal, arahkan kembali ke halaman daftar akun
-		header('Location: register.php');
-	}
-} else {
-	// Jika username sudah terdaftar, arahkan kembali ke halaman daftar akun
-    // ini sementara masih di redirect ke halaman yang sama
-	header('Location: register.php');
+	session_start();
+	$_SESSION['user'] = $username;
+	header("Location: index.php");
 }
-
-mysqli_close($conn);
 ?>
